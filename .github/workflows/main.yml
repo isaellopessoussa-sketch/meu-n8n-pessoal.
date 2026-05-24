@@ -1,0 +1,75 @@
+name: Gerador Automatico do App n8n
+
+on:
+  workflow_dispatch: # Permite que você clique num botão para ativar quando quiser
+
+jobs:
+  criar-e-compilar:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 1️⃣ Baixar o Repositório
+      uses: actions/checkout@v3
+
+    - name: 2️⃣ Criar todos os arquivos do App (package e html) automaticamente
+      run: |
+        echo '{
+          "name": "meu-n8n-mobile",
+          "version": "1.0.0",
+          "description": "Meu n8n pessoal para celular",
+          "main": "index.js",
+          "scripts": {
+            "build": "echo \"Construindo o app...\""
+          },
+          "dependencies": {
+            "@capacitor/core": "^5.0.0",
+            "@capacitor/android": "^5.0.0"
+          }
+        }' > package.json
+
+        echo '<!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Meu n8n Mobile</title>
+            <style>
+                body { margin: 0; font-family: sans-serif; background-color: #1a1a1a; color: white; display: flex; flex-direction: column; height: 100vh; }
+                header { background: #2c2c2c; padding: 15px; text-align: center; font-weight: bold; border-bottom: 2px solid #ff6b6b; }
+                .grid { flex: 1; background-image: radial-gradient(#333 1px, transparent 1px); background-size: 20px 20px; display: flex; align-items: center; justify-content: center; }
+                .node { background: #333; border: 2px solid #ff6b6b; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); text-align: center; }
+            </style>
+        </head>
+        <body>
+            <header>🐙 MEU N8N DE CELULAR</header>
+            <div class="grid">
+                <div class="node">
+                    <h3>⏰ Nó Gatilho</h3>
+                    <p>Rotina Gamer Ativa</p>
+                </div>
+            </div>
+        </body>
+        </html>' > index.html
+
+    - name: 3️⃣ Configurar o Java (Necessário para criar o APK)
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+
+    - name: 4️⃣ Instalar as ferramentas de Android
+      run: |
+        npm install
+        npx cap init "Meu n8n Mobile" "com.meun8n.app" --web-dir=.
+        npx cap add android
+
+    - name: 5️⃣ Criar o arquivo APK do Android
+      run: |
+        cd android
+        ./gradlew assembleDebug
+
+    - name: 6️⃣ Liberar o download do seu .APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: meu-n8n-instalador-apk
+        path: android/app/build/outputs/apk/debug/app-debug.apk
