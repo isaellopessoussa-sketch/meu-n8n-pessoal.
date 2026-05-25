@@ -16,11 +16,17 @@ jobs:
         distribution: 'zulu'
         java-version: '17'
 
-    - name: 3 Configurar Android e Capacitor
+    - name: 3 Configurar Pasta Web e Android
       run: |
+        # Cria a pasta www que o Capacitor exige e move o index para lá
+        mkdir -p www
+        cp index.html www/ 2>/dev/null || echo "Ainda sem index na raiz"
+        
         npm install
         npm install @capacitor/core @capacitor/cli @capacitor/android
-        npx capacitor init "Meu n8n Mobile" "com.meun8n.app" --web-dir=.
+        
+        # Inicializa apontando para a pasta www de verdade
+        npx capacitor init "Meu n8n Mobile" "com.meun8n.app" --web-dir=www
         npx capacitor add android
 
     - name: 4 Compilar APK
