@@ -1,35 +1,35 @@
-name: Gerador Automatico do App n8n
+name: Gerador App
 
 on:
   workflow_dispatch:
 
 jobs:
-  criar-e-compilar:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: 1️⃣ Baixar o Repositório
+    - name: 1 Baixar Codigo
       uses: actions/checkout@v3
 
-    - name: 2️⃣ Configurar o Java
+    - name: 2 Instalar Java
       uses: actions/setup-java@v3
       with:
         distribution: 'zulu'
         java-version: '17'
 
-    - name: 3️⃣ Instalar e Configurar o Capacitor
+    - name: 3 Configurar Android e Capacitor
       run: |
         npm install
+        npm install @capacitor/core @capacitor/cli @capacitor/android
         npx capacitor init "Meu n8n Mobile" "com.meun8n.app" --web-dir=.
         npx capacitor add android
 
-    - name: 4️⃣ Criar o arquivo APK do Android
+    - name: 4 Compilar APK
       run: |
         cd android
         ./gradlew assembleDebug
 
-    - name: 5️⃣ Liberar o download do teu .APK
+    - name: 5 Baixar Instalador
       uses: actions/upload-artifact@v4
       with:
-        name: meu-n8n-instalador-apk
+        name: meu-n8n-apk
         path: android/app/build/outputs/apk/debug/app-debug.apk
